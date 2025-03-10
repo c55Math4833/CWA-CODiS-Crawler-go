@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -14,21 +15,21 @@ jobs:
       contents: read
       attestations: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22.3'
-          cache: false
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22.3'
+        cache: false
 
-      - name: Building
-        run: |
-          export GOOS=windows
-          export GOARCH=amd64
-          go build -ldflags "-s -w" -o "CODiS Crawler Tool.exe" main.go
-
+    - name: Building
+      run: |
+        export GOOS=windows
+        export GOARCH=amd64
+        go build -ldflags "-s -w" -o "CODiS Crawler Tool.exe" main.go
+    
       - name: UPX Compression
         run: |
           sudo apt-get update
@@ -45,24 +46,3 @@ jobs:
         with:
           name: CODiS Crawler Tool
           path: CODiS Crawler Tool.exe
-
-      - name: Get commit hash
-        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - name: Create tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: git tag ${COMMIT_HASH}
-      - name: Push tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: git push origin ${COMMIT_HASH}
-      - name: Create release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: softprops action-gh-release@v2
-        with:
-          tag_name: ${COMMIT_HASH}
-          files: "CODiS Crawler Tool.exe"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload Build Artifacts
-        uses: actions upload-artifact@v4.3.3
-        with:
-          name: CODiS Crawler Tool
-          path: "CODiS Crawler Tool.exe"
