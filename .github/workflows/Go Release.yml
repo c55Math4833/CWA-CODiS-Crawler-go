@@ -6,8 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
+permissions:
+  contents: write
 
+jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -41,17 +43,8 @@ jobs:
       with:
         name: CODiS Crawler Tool
         path: CODiS Crawler Tool.exe
-
-  release:
     - name: GH Release
       uses: softprops/action-gh-release@v2
       with:
         files: CODiS Crawler Tool.exe
         token: ${{ secrets.GITHUB_TOKEN }}
-        body: |
-          **Changes:**
-          - Initial release
-        draft: false
-        prerelease: false
-        tag: v1.0.0
-        title: v1.0.0
