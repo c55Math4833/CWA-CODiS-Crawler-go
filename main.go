@@ -168,7 +168,7 @@ func getStationData(stationID string, timeStart, timeEnd time.Time) ([]map[strin
 	data.Set("item", "")
 
 	var records []map[string]string
-	retryCount := 3 // 最大重試次數
+	retryCount := 3             // 最大重試次數
 	waitDuration := time.Second // 初始等待時間
 
 	for i := 0; i <= retryCount; i++ {
@@ -178,7 +178,7 @@ func getStationData(stationID string, timeStart, timeEnd time.Time) ([]map[strin
 				log.Printf("API 請求失敗 (嘗試 %d/%d): %v，等待 %v 後重試...", i+1, retryCount, err, waitDuration)
 				time.Sleep(waitDuration)
 				waitDuration *= 2 // 指數退避
-				continue // 進行重試
+				continue          // 進行重試
 			} else {
 				return nil, fmt.Errorf("API 請求失敗 (已達最大重試次數): %w", err)
 			}
@@ -290,7 +290,7 @@ func getStationData(stationID string, timeStart, timeEnd time.Time) ([]map[strin
 				log.Printf("API 伺服器錯誤 (%d) (嘗試 %d/%d)，等待 %v 後重試...", resp.StatusCode, i+1, retryCount, waitDuration)
 				time.Sleep(waitDuration)
 				waitDuration *= 2 // 指數退避
-				continue // 進行重試
+				continue          // 進行重試
 			} else {
 				return nil, fmt.Errorf("API 伺服器錯誤 (%d) (已達最大重試次數)", resp.StatusCode)
 			}
@@ -303,7 +303,7 @@ func getStationData(stationID string, timeStart, timeEnd time.Time) ([]map[strin
 }
 
 var csvColumns = []string{
-	"DataDate", "WindSpeed", "WindDirection", "SunshineDuration",
+	"DataDate", "WindSpeed", "WindDirection",
 	"MaxAirTemperature", "MeanAirTemperature", "MinAirTemperature",
 	"MaxAirTemperatureTime", "MinAirTemperatureTime",
 	"MaxStationPressure", "MinStationPressure", "MeanStationPressure",
@@ -334,7 +334,12 @@ func writeCSV(filename string, records []map[string]string) error {
 	for _, rec := range records {
 		row := make([]string, len(csvColumns))
 		for i, col := range csvColumns {
-			row[i] = rec[col]
+			val := rec[col]
+			if val == "<nil>" {
+				row[i] = ""
+			} else {
+				row[i] = val
+			}
 		}
 		if err := writer.Write(row); err != nil {
 			return err
@@ -440,6 +445,7 @@ MainLoop:
 			for {
 				clearScreen()
 				stationID, cancelled := getInputWithEsc("請輸入測站代碼（按 Esc 返回主選單）：")
+				stationID = strings.TrimSpace(stationID)
 				if cancelled {
 					break stationInput // 返回主選單
 				}
@@ -512,6 +518,7 @@ MainLoop:
 				}
 
 				// 處理測站資料流程 (選項 1)
+				// debug: fmt.Print(stationID, timeStart, timeEnd)
 				if err := processStationData(stationID, timeStart, timeEnd); err != nil {
 					fmt.Println("處理測站資料時發生錯誤：", err)
 				}
@@ -612,6 +619,7 @@ MainLoop:
 					fmt.Printf("%-10s %-20s %-10s %-10s\n", s.StationID, s.StationName, s.CountryName, s.Area)
 				}
 				stationID, cancelled := getInputWithEsc("請輸入測站代碼（按 Esc 返回上一步）：")
+				stationID = strings.TrimSpace(stationID)
 				if cancelled {
 					// 返回到縣市選擇
 					goto countySelect
@@ -630,6 +638,7 @@ MainLoop:
 				}
 				clearScreen()
 				fmt.Printf("您選擇的測站 %s - %s 位於 %s %s\n", selectedStation.StationID, selectedStation.StationName, selectedStation.CountryName, selectedStation.Area)
+				stationID = selectedStation.StationID
 				break
 			}
 
@@ -685,6 +694,8 @@ MainLoop:
 			}
 
 			// 處理測站資料流程 (選項 2)
+			stationID = selectedStation.StationID
+			// debug: fmt.Println(stationID, timeStart, timeEnd)
 			if err := processStationData(stationID, timeStart, timeEnd); err != nil {
 				fmt.Println("處理測站資料時發生錯誤：", err)
 			}
