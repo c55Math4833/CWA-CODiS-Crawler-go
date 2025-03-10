@@ -465,7 +465,7 @@ MainLoop:
 			startDateInput:
 				var timeStart time.Time
 				for {
-					timeStartStr, cancelled := getInputWithEsc("請輸入查詢起始日期（格式：YYYY-MM-DD，按 Esc 返回上一步）：")
+					timeStartStr, cancelled := getInputWithEsc("請輸入查詢起始日期（格式：YYYY-MM-DD；返回：Esc ）：")
 					if cancelled {
 						// 返回到測站代碼輸入
 						continue stationInput
@@ -491,7 +491,7 @@ MainLoop:
 
 				var timeEnd time.Time
 				for {
-					timeEndStr, cancelled := getInputWithEsc("請輸入查詢結束日期（格式：YYYY-MM-DD，按 Esc 返回上一步）：")
+					timeEndStr, cancelled := getInputWithEsc("請輸入查詢結束日期（格式：YYYY-MM-DD；返回：Esc ）：")
 					if cancelled {
 						// 返回到查詢起始日期
 						goto startDateInput
@@ -638,7 +638,7 @@ MainLoop:
 		startDateSelect:
 			var timeStart time.Time
 			for {
-				timeStartStr, cancelled := getInputWithEsc("請輸入查詢起始日期（格式：YYYY-MM-DD，按 Esc 返回上一步）：")
+				timeStartStr, cancelled := getInputWithEsc("請輸入查詢起始日期（格式：YYYY-MM-DD；返回：Esc ）：")
 				if cancelled {
 					// 返回到測站選擇
 					goto stationSelect
@@ -664,7 +664,7 @@ MainLoop:
 
 			var timeEnd time.Time
 			for {
-				timeEndStr, cancelled := getInputWithEsc("請輸入查詢結束日期（格式：YYYY-MM-DD，按 Esc 返回上一步）：")
+				timeEndStr, cancelled := getInputWithEsc("請輸入查詢結束日期（格式：YYYY-MM-DD；返回：Esc ）：")
 				if cancelled {
 					// 返回到查詢起始日期
 					goto startDateSelect
