@@ -4,6 +4,11 @@ on:
   push:
     tags: [ "v*" ]  # 當推送以 v 開頭的 tag 時觸發
 
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
