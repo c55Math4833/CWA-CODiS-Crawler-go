@@ -1,0 +1,61 @@
+name: Go
+
+on:
+  push:
+    tags: [ "v*" ]  # 當推送以 v 開頭的 tag 時觸發
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.3'
+          cache: false
+
+      - name: Building
+        run: |
+          export GOOS=windows
+          export GOARCH=amd64
+          go build -ldflags "-s -w" -o "CODiS Crawler Tool.exe" main.go
+      
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v1.1.2
+        with:
+          subject-path: "CODiS Crawler Tool.exe"
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: CODiS Crawler Tool
+          path: CODiS Crawler Tool.exe
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: "Automatically created release for ${GITHUB_REF}"
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: CODiS Crawler Tool.exe
+          asset_name: "CODiS Crawler Tool.exe"
+          asset_content_type: application/octet-stream
