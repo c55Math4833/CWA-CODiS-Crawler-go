@@ -47,5 +47,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: CODiS Crawler Tool.exe
+        name: ${{ github.ref }}
+        make_latest: true
         token: ${{ secrets.GITHUB_TOKEN }}
+        files: CODiS Crawler Tool.exe
