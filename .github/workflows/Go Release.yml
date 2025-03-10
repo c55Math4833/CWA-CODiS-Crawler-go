@@ -1,21 +1,15 @@
-name: Go
+name: Go Release
 
 on:
   push:
-    tags: [ "v*" ]  # 當推送以 v 開頭的 tag 時觸發
+    tags: [ "v*" ]
 
 permissions:
-  id-token: write
   contents: write
-  attestations: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      attestations: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,7 +25,7 @@ jobs:
           export GOOS=windows
           export GOARCH=amd64
           go build -ldflags "-s -w" -o "CODiS Crawler Tool.exe" main.go
-      
+
       - name: Attest Build Provenance
         uses: actions/attest-build-provenance@v1.1.2
         with:
@@ -44,23 +38,8 @@ jobs:
           path: CODiS Crawler Tool.exe
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1.16.0
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: "Automatically created release for ${GITHUB_REF}"
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        uses: shogo82148/actions-upload-release-asset@v1.7.8
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: CODiS Crawler Tool.exe
-          asset_name: "CODiS Crawler Tool.exe"
-          asset_content_type: application/octet-stream
+          tag: ${{ github.ref_name }}           # 例如 v1.0.0，而非 refs/tags/v1.0.0
+          name: "Release ${{ github.ref_name }}"
+          body: "Automatically created release for ${{ github.ref }}"
