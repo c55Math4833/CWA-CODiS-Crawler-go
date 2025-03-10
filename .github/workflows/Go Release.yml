@@ -1,15 +1,18 @@
-name: Go Release
+name: Go
 
 on:
   push:
-    tags: [ "v*" ]
-
-permissions:
-  contents: write
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +29,12 @@ jobs:
           export GOARCH=amd64
           go build -ldflags "-s -w" -o "CODiS Crawler Tool.exe" main.go
 
+      - name: UPX Compression
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y upx-ucl
+          upx --best "CODiS Crawler Tool.exe"
+
       - name: Attest Build Provenance
         uses: actions/attest-build-provenance@v1.1.2
         with:
@@ -37,9 +46,23 @@ jobs:
           name: CODiS Crawler Tool
           path: CODiS Crawler Tool.exe
 
-      - name: Create Release
-        uses: ncipollo/release-action@v1.16.0
+      - name: Get commit hash
+        run: echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Create tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: git tag ${COMMIT_HASH}
+      - name: Push tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: git push origin ${COMMIT_HASH}
+      - name: Create release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops action-gh-release@v2
         with:
-          tag: ${{ github.ref_name }}           # 例如 v1.0.0，而非 refs/tags/v1.0.0
-          name: "Release ${{ github.ref_name }}"
-          body: "Automatically created release for ${{ github.ref }}"
+          tag_name: ${COMMIT_HASH}
+          files: "CODiS Crawler Tool.exe"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Build Artifacts
+        uses: actions upload-artifact@v4.3.3
+        with:
+          name: CODiS Crawler Tool
+          path: "CODiS Crawler Tool.exe"
