@@ -265,18 +265,18 @@ func getStationData(stationID string, timeStart, timeEnd time.Time) ([]map[strin
 					record["AccumulationPrecipitation"] = fmt.Sprintf("%v", pr["Accumulation"])
 					record["HourlyMaxPrecipitation"] = fmt.Sprintf("%v", pr["HourlyMaximum"])
 					record["HourlyMaxPrecipitationTime"] = fmt.Sprintf("%v", pr["HourlyMaximumTime"])
-					record["MeltFlagPrecipitation"] = fmt.Sprintf("%v", pr["MeltFlag"])
+					// record["MeltFlagPrecipitation"] = fmt.Sprintf("%v", pr["MeltFlag"])
 				}
 				// SunshineDuration
-				if sd, ok := recMap["SunshineDuration"].(map[string]interface{}); ok {
-					record["SunshineDuration"] = fmt.Sprintf("%v", sd["Total"])
-				}
+				// if sd, ok := recMap["SunshineDuration"].(map[string]interface{}); ok {
+				// 	record["SunshineDuration"] = fmt.Sprintf("%v", sd["Total"])
+				// }
 				// GlobalSolarRadiation
-				if gsr, ok := recMap["GlobalSolarRadiation"].(map[string]interface{}); ok {
-					record["AccumulationGlobalSolarRadiation"] = fmt.Sprintf("%v", gsr["Accumulation"])
-					record["HourlyMaximumGlobalSolarRadiation"] = fmt.Sprintf("%v", gsr["HourlyMaximum"])
-					record["HourlyMaximumGlobalSolarRadiationTime"] = fmt.Sprintf("%v", gsr["HourlyMaximumTime"])
-				}
+				// if gsr, ok := recMap["GlobalSolarRadiation"].(map[string]interface{}); ok {
+				// 	record["AccumulationGlobalSolarRadiation"] = fmt.Sprintf("%v", gsr["Accumulation"])
+				// 	record["HourlyMaximumGlobalSolarRadiation"] = fmt.Sprintf("%v", gsr["HourlyMaximum"])
+				// 	record["HourlyMaximumGlobalSolarRadiationTime"] = fmt.Sprintf("%v", gsr["HourlyMaximumTime"])
+				// }
 				// 觀測日期
 				if obs, ok := recMap["DataDate"]; ok {
 					record["DataDate"] = fmt.Sprintf("%v", obs)
@@ -312,8 +312,6 @@ var csvColumns = []string{
 	"MaxRelativeHumidityTime", "MinRelativeHumidityTime",
 	"MaxPeakGust", "MaxPeakGustTime", "MaxPeakGustDirection",
 	"AccumulationPrecipitation", "HourlyMaxPrecipitation", "HourlyMaxPrecipitationTime",
-	"MeltFlagPrecipitation",
-	"AccumulationGlobalSolarRadiation", "HourlyMaximumGlobalSolarRadiation", "HourlyMaximumGlobalSolarRadiationTime",
 }
 
 // writeCSV 將資料寫入 CSV 檔案
